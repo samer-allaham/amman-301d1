@@ -22,6 +22,8 @@ Neighborhood.prototype.render = function() {
   let template = Handlebars.compile(templateMarkup);
   let output = template(this);
   $('#neighborhoods').append( output );
+
+  // $('#neighborhoods').append(Handlebars.compile( $('#neighborhood-template').html() )(this)
 };
 
 
