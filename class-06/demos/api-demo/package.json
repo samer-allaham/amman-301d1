@@ -1,15 +1,13 @@
 {
   "name": "api-demo",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "Our Class API App",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "John",
+  "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
