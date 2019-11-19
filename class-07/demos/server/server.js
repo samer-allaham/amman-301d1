@@ -1,87 +1,81 @@
 'use strict';
 
-// Load Environment Variables from the .env file
+// Dependecies (express, cors, dotenv)
+
 require('dotenv').config();
-
-// Application Dependencies
 const express = require('express');
-const superagent = require('superagent');
 const cors = require('cors');
+const superagent = require('superagent');
 
-// Application Setup
-const PORT = process.env.PORT;
-const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 3000;
 
-let locations = {};
+const server = express();
 
-// Route Definitions
-app.get('/location', locationHandler);
-app.get('/weather', weatherHandler);
-app.use('*', notFoundHandler);
-app.use(errorHandler);
+server.use( cors() );
 
+server.get('/location', locationHandler);
+server.get('/weather', weatherHandler);
 
-function locationHandler(request,response) {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GEOCODE_API_KEY}`;
-
-  if ( locations[url] ) {
-    response.send(locations[url]);
-  }
-  else {
-    superagent.get(url)
-      .then(data => {
-        const geoData = data.body;
-        const location = new Location(request.query.data, geoData);
-        locations[url] = location;
-        response.send(location);
-      })
-      .catch( () => {
-        errorHandler('So sorry, something went wrong.', request, response);
-      });
-  }
+function locationHandler(req,res) {
+  // Query String = ?a=b&c=d
+  getLocation(req.query.data)
+    .then( locationData => res.status(200).json(locationData) );
 }
 
-function Location(query, geoData) {
-  this.search_query = query;
-  this.formatted_query = geoData.results[0].formatted_address;
-  this.latitude = geoData.results[0].geometry.location.lat;
-  this.longitude = geoData.results[0].geometry.location.lng;
-}
+function getLocation(city) {
+  // No longer get from file
+  // let data = require('./data/geo.json');
 
+  // Get it from Google Directly`
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${process.env.GOOGLE_GEOCODE_API}`
 
-// http://localhost:3000/weather?data%5Blatitude%5D=47.6062095&data%5Blongitude%5D=-122.3320708
-// That encoded query string is: data[latitude]=47.6062095&data[longitude]=122.3320708
-function weatherHandler(request,response) {
-
-  const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.query.data.latitude},${request.query.data.longitude}`;
-
-  superagent.get(url)
+  return superagent.get(url)
     .then( data => {
-      const weatherSummaries = data.body.daily.data.map(day => {
+      return new Location(city, data.body);
+    })
+
+}
+
+function Location(city, data) {
+  this.search_query = city;
+  this.formatted_query = data.results[0].formatted_address;
+  this.latitude = data.results[0].geometry.location.lat;
+  this.longitude = data.results[0].geometry.location.lng;
+
+}
+
+// ------------------------------- //
+// WEATHER
+// ------------------------------- //
+
+function weatherHandler(req,res) {
+  // Query String = ?a=b&c=d
+  getWeather(req.query.data)
+    .then( weatherData => res.status(200).json(weatherData) );
+
+}
+
+function getWeather(query) {
+  // let data = require('./data/darksky.json');
+  const url = `https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${query.latitude},${query.longitude}`;
+  return superagent.get(url)
+    .then( data => {
+      let weather = data.body;
+      return weather.daily.data.map( (day) => {
         return new Weather(day);
       });
-      response.status(200).json(weatherSummaries);
-    })
-    .catch( () => {
-      errorHandler('So sorry, something went wrong.', request, response);
     });
-
 }
 
 function Weather(day) {
   this.forecast = day.summary;
-  this.time = new Date(day.time * 1000).toString().slice(0, 15);
-}
-
-function notFoundHandler(request,response) {
-  response.status(404).send('huh?');
-}
-
-function errorHandler(error,request,response) {
-  response.status(500).send(error);
+  this.time = new Date(day.time * 1000).toDateString();
 }
 
 
-// Make sure the server is listening for requests
-app.listen(PORT, () => console.log(`App is listening on ${PORT}`) );
+server.use('*', (req,res) => {
+  // This is a comment
+  res.status(404).send('huh?????');
+});
+
+server.listen( PORT, () => console.log('hello world, from port', PORT));
