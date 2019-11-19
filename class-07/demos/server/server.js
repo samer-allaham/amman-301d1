@@ -27,7 +27,7 @@ function getLocation(city) {
   // let data = require('./data/geo.json');
 
   // Get it from Google Directly`
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${process.env.GOOGLE_GEOCODE_API}`
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${process.env.GEOCODE_API_KEY}`
 
   return superagent.get(url)
     .then( data => {
