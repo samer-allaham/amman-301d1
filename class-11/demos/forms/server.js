@@ -1,18 +1,29 @@
 'use strict';
 
+require('dotenv').config();
 const express = require('express');
 
-const app = express();
 const PORT = process.env.PORT || 3000;
+const app = express();
 
-app.use(express.urlencoded({extended: true}));
-app.use(express.static('./public'));
+app.use( express.json() );
 
-app.post('/contact', (request, response) => {
-  console.log(request.body);
-  response.sendFile('./thanks.html', {root: './public'});
+// MAGIC -- converts a POST from a form into req.body for you
+app.use( express.urlencoded({extended:true}));
+app.use( express.static('./public') );
+
+app.get('/incoming', (req,res) => {
+  console.log('Got here from a get request ... ', req.query);
+  res.redirect('/thanks.html');
 });
 
-app.get('*', (request, response) => response.status(404).send('This route does not exist'));
+app.post('/incoming', (req,res) => {
+  console.log('Got here from a post request ... ', req.body);
+  res.redirect('/thanks.html');
+});
 
-app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+/// app.put()
+/// app.delete()
+
+
+app.listen( PORT, () => console.log(`Up on port ${PORT}`));

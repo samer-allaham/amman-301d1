@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Books</title>
+      <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main>
+        <ul>
+
+            <% books.forEach( (book) => { %>
+
+              <li><%= book.volumeInfo.title %></li>
+
+            <% }); %>
+
+        </ul>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
