@@ -10,7 +10,12 @@
 
             <% books.forEach( (book) => { %>
 
-              <li><%= book.volumeInfo.title %></li>
+              <li>
+                  <div><%= book.title %></div>
+                  <div><%= book.author %></div>
+                  <div><%= book.description %></div>
+                  <div><img src="<%= book.image %>" /></div>
+              </li>
 
             <% }); %>
 

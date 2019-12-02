@@ -3,9 +3,13 @@
   <head><title>John's Template</title></head>
   <body>
     <main>
-        <h1>Do these things</h1>
-        <p><a href="/list">List of Stuff</a></p>
-        <p><a href="/books">Books</a></p>
+        <form action="/searches" method="get">
+            <input type="text" placeholder="thing to search for" name="words" />
+            <div><input type="radio" name="searchBy" value="title"> Title</div>
+            <div><input type="radio" name="searchBy" value="author"> Author</div>
+            <button>DO IT!</button>
+
+        </form>
     </main>
   </body>
 </html>

@@ -17,17 +17,25 @@ app.get('/', (req,res) => {
   res.render('pages/index');
 });
 
-app.get('/list', (req,res) => {
-  let people = ['John','Cathy','Zach','Allie','Char','Rosie'];
-  res.render('pages/list', {figglesandbits:people});
-});
-
-app.get('/books', (req,res) => {
-  let url = 'https://www.googleapis.com/books/v1/volumes?q=peanuts';
+app.get('/searches', (req,res) => {
+  console.log(req.query);
+  // { words: '-99999', searchBy: 'title' }
+  let searchBy = req.query.searchBy;
+  let words = req.query.words;
+  let url = `https://www.googleapis.com/books/v1/volumes?q=in${searchBy}:${words}`;
   superagent.get(url)
     .then( data => {
-      res.render('pages/books', {books:data.body.items});
+      let books = data.body.items.map( book => new Book(book) );
+      res.render('pages/books', {books:books});
     });
 });
+
+function Book(data) {
+  this.title = data.volumeInfo.title;
+  this.author = (data.volumeInfo.authors && data.volumeInfo.authors[0]) || '';
+  this.description = data.volumeInfo.description;
+  this.isbn = (data.volumeInfo.industryIdentifiers && data.volumeInfo.industryIdentifiers[0].identifier) || '';
+  this.image = (data.volumeInfo.imageLinks && data.volumeInfo.imageLinks.thumbnail) || '';
+}
 
 app.listen(PORT, () => console.log('Up on port', PORT));
